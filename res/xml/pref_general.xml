@@ -1,0 +1,49 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="proxyEnabled"
+        android:summary="@string/pref_description_enable_proxy"
+        android:title="@string/pref_title_enable_proxy" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="proxyHost"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_proxy_host" />
+    <EditTextPreference
+        android:defaultValue="8080"
+        android:inputType="number"
+        android:key="proxyPort"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_proxy_port" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="preventService"
+        android:summary="@string/pref_description_prevent_service"
+        android:title="@string/pref_title_prevent_service" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="preventWakeLock"
+        android:summary="@string/pref_description_prevent_wake_lock"
+        android:title="@string/pref_title_prevent_wake_lock" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="preventAlarm"
+        android:summary="@string/pref_description_prevent_alarm"
+        android:title="@string/pref_title_prevent_alarm" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/alarm_multiplier_names"
+        android:entryValues="@array/alarm_multiplier_values"
+        android:key="alarmMultiplier"
+        android:title="Alarm Multiplier" />
+
+</PreferenceScreen>
