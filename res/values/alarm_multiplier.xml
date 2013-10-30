@@ -11,7 +11,17 @@
         <item>8</item>
         <item>9</item>
         <item>10</item>
-    </string-array>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        </string-array>
     <string-array name="alarm_multiplier_names">
         <item>Ignored</item>
         <item>x 2</item>
@@ -23,5 +33,15 @@
         <item>x 8</item>
         <item>x 9</item>
         <item>x 10</item>
+        <item>x 15</item>
+        <item>x 20</item>
+        <item>x 30</item>
+        <item>x 40</item>
+        <item>x 50</item>
+        <item>x 60</item>
+        <item>x 70</item>
+        <item>x 80</item>
+        <item>x 90</item>
+        <item>x 100</item>
     </string-array>   
 </resources>
