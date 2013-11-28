@@ -11,4 +11,6 @@
 	<string name="pref_description_prevent_service">Prevent the app to startService</string>
 	<string name="pref_title_prevent_wake_lock">Prevent Wake Lock</string>
 	<string name="pref_description_prevent_wake_lock">Prevent the app to acquire wake lock</string>
+	<string name="pref_description_limit_bitmap_dimensions">Limit BitmapFactory to output a bitmap not larger than screen resolution.</string>
+	<string name="pref_title_limit_bitmap_dimensions">Limit Bitmap dimensions</string>
 </resources>

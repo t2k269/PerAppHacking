@@ -25,6 +25,12 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="limitBitmapDimensions"
+        android:summary="@string/pref_description_limit_bitmap_dimensions"
+        android:title="@string/pref_title_limit_bitmap_dimensions" />
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="preventService"
         android:summary="@string/pref_description_prevent_service"
         android:title="@string/pref_title_prevent_service" />
