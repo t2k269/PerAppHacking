@@ -109,9 +109,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/forceUseNotificationVolumeForMusic", false)) {
-	    				if ((Integer)param.args[0] == AudioManager.STREAM_MUSIC) {
-	    					param.args[0] = AudioManager.STREAM_NOTIFICATION;
-	    				}
+	    				param.args[0] = AudioManager.STREAM_NOTIFICATION;
 	    			}
 				}
     		};
