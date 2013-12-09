@@ -8,6 +8,7 @@ public class AppInfo implements Comparable<AppInfo> {
 	public int proxyPort = -1;
 	
 	public boolean limitBitmapDimensions = false;
+	public boolean forceUseNotificationVolumeForMusic = false;
 
 	public boolean preventService = false;
 	public boolean preventWakeLock = false;
@@ -21,7 +22,7 @@ public class AppInfo implements Comparable<AppInfo> {
 	}
 	
 	public boolean isEnabled() {
-		return proxyHost != null || limitBitmapDimensions || preventAlarm || preventService || preventWakeLock;
+		return proxyHost != null || limitBitmapDimensions || forceUseNotificationVolumeForMusic || preventAlarm || preventService || preventWakeLock;
 	}
 
 	@Override

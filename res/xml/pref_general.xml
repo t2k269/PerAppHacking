@@ -31,6 +31,12 @@
     
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="forceUseNotificationVolumeForMusic"
+        android:summary="@string/pref_description_force_use_notification_volume_for_music"
+        android:title="@string/pref_title_force_use_notification_volume_for_music" />
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="preventService"
         android:summary="@string/pref_description_prevent_service"
         android:title="@string/pref_title_prevent_service" />

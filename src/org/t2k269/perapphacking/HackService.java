@@ -13,6 +13,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.os.SystemClock;
 import android.util.TypedValue;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -101,6 +102,20 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
     		XposedHelpers.findAndHookMethod(clazz, "decodeResourceStream", Resources.class, TypedValue.class, InputStream.class, Rect.class, BitmapFactory.Options.class, hook);
     		XposedHelpers.findAndHookMethod(clazz, "decodeStream", InputStream.class, hook);
     		XposedHelpers.findAndHookMethod(clazz, "decodeStream", InputStream.class, Rect.class, BitmapFactory.Options.class, hook);
+    	}
+    	if (prefs.getBoolean(lpparam.packageName + "/forceUseNotificationVolumeForMusic", false)) {
+    		Class clazz = XposedHelpers.findClass("android.media.MediaPlayer", lpparam.classLoader);
+    		XC_MethodHook hook = new XC_MethodHook() {
+				@Override
+    			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+	    			if (prefs.getBoolean(lpparam.packageName + "/forceUseNotificationVolumeForMusic", false)) {
+	    				if ((Integer)param.args[0] == AudioManager.STREAM_MUSIC) {
+	    					param.args[0] = AudioManager.STREAM_NOTIFICATION;
+	    				}
+	    			}
+				}
+    		};
+    		XposedHelpers.findAndHookMethod(clazz, "setAudioStreamType", int.class, hook);
     	}
     	if (prefs.getBoolean(lpparam.packageName + "/preventAlarm", false)) {
     		Class alarmManagerClass = XposedHelpers.findClass("android.app.AlarmManager", lpparam.classLoader);
