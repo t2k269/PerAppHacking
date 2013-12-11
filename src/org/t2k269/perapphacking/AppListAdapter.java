@@ -1,7 +1,6 @@
 package org.t2k269.perapphacking;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -14,15 +13,20 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 class AppListAdapter extends BaseAdapter {
+	
+	interface DataProvider {
+		List<AppInfo> getAppList();
+	}
 
 	private Context context;
 
 	private boolean enabledOnly = false;
-	private List<AppInfo> apps = Collections.emptyList();
+	private DataProvider dataProvider;
 	private List<AppInfo> filteredApps = new ArrayList<AppInfo>(100);
 	
-	public AppListAdapter(Context context, boolean enabledOnly) {
+	public AppListAdapter(Context context, DataProvider dataProvider, boolean enabledOnly) {
 		this.context = context;
+		this.dataProvider = dataProvider; 
 		this.enabledOnly = enabledOnly;
 	}
 	
@@ -30,15 +34,15 @@ class AppListAdapter extends BaseAdapter {
 	void filter(String filter) {
 		if (enabledOnly) {
 			filteredApps.clear();
-			for (AppInfo app : apps) {
+			for (AppInfo app : dataProvider.getAppList()) {
 				if (app.isEnabled()) {
 					filteredApps.add(app);
 				}
 			}
 		} else {
 			filteredApps.clear();
-			filter = filter == null ? null : filter.toLowerCase();
-			for (AppInfo app : apps) {
+			filter = filter == null ? null : filter.trim().toLowerCase();
+			for (AppInfo app : dataProvider.getAppList()) {
 				if (filter == null || filter.length() == 0 ||
 					app.name.toLowerCase().indexOf(filter) >= 0 ||
 					app.packageName.toLowerCase().indexOf(filter) >= 0) {
@@ -49,8 +53,7 @@ class AppListAdapter extends BaseAdapter {
 		this.notifyDataSetChanged();
 	}
 	
-	public void setApps(List<AppInfo> apps) {
-		this.apps = new ArrayList<AppInfo>(apps);
+	public void refreshData() {
 		filter(null);
 	}
 	

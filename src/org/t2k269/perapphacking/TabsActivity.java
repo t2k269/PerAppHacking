@@ -3,13 +3,14 @@ package org.t2k269.perapphacking;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -19,18 +20,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
-import android.widget.ListView;
 
-public class TabsActivity extends FragmentActivity {
+public class TabsActivity extends FragmentActivity implements AppListAdapter.DataProvider {
 
 	private static final String TAG = TabsActivity.class.getSimpleName();
 
@@ -45,7 +37,6 @@ public class TabsActivity extends FragmentActivity {
 	SectionsPagerAdapter mSectionsPagerAdapter;
 
 	private List<AppInfo> apps;
-	private List<AppsListFragment> fragments = new ArrayList<AppsListFragment>();
 	
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -66,7 +57,7 @@ public class TabsActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-		loadAppListAsync();
+		reloadAppListAsync();
 	}
 
 	@Override
@@ -74,7 +65,7 @@ public class TabsActivity extends FragmentActivity {
 		super.onActivityResult(requestCode,  resultCode,  data);
 	}
 	
-	private void updatePackage(String packageName) {
+	void updatePackage(String packageName) {
 		AppInfo _target = null;
 		for (int i = apps.size() - 1; i >= 0; i--) {
 			AppInfo app = (AppInfo)apps.get(i);
@@ -88,17 +79,14 @@ public class TabsActivity extends FragmentActivity {
 			final AppInfo target = _target;
 			
 			loadAppSettings(target);
-			for (AppsListFragment fragment : fragments) {
-				fragment.appsChanged();
+			for (Fragment f : mSectionsPagerAdapter.fragments)
+				if (f instanceof AppsListFragment) {
+				((AppsListFragment)f).appsChanged();
 			}
 		}
 	}
 
-	private void addFragment(AppsListFragment fragment) {
-		fragments.add(fragment);
-	}
-	
-	private void loadAppListAsync() {
+	void reloadAppListAsync() {
 		AsyncTask<Integer, Void, List<AppInfo>> task = new AsyncTask<Integer, Void, List<AppInfo>>() {
 			
 			private ProgressDialog dialog;
@@ -110,10 +98,15 @@ public class TabsActivity extends FragmentActivity {
 		            PackageManager pm = getPackageManager();
 		            List<PackageInfo> appListInfo = pm.getInstalledPackages(0);
 		            for (PackageInfo p : appListInfo) {
-		            	AppInfo app = new AppInfo(p.applicationInfo.loadLabel(pm).toString(), p.applicationInfo.packageName);
+		            	String name = p.applicationInfo.packageName;
+		            	try {
+		            		name = p.applicationInfo.loadLabel(pm).toString();
+		            	} catch (Exception ex) {
+		            	}
+		            	AppInfo app = new AppInfo(name, p.applicationInfo.packageName);
 		    			apps.add(app);
 		    			loadAppSettings(app);
-		            }    
+		            }
 		            Collections.sort(apps);
 		            return apps;
 		        } catch (Exception e) {
@@ -135,8 +128,9 @@ public class TabsActivity extends FragmentActivity {
 			protected void onPostExecute(List<AppInfo> result) {
 				dialog.dismiss();
 				apps = result;
-				for (AppsListFragment fragment : fragments) {
-					fragment.setApps(apps);
+				for (Fragment f : mSectionsPagerAdapter.fragments)
+					if (f instanceof AppsListFragment) {
+					((AppsListFragment)f).appsChanged();
 				}
 			}
 		};
@@ -168,6 +162,29 @@ public class TabsActivity extends FragmentActivity {
 			app.alarmMultiplier = 0;
 		}
 	}
+	
+	@SuppressLint("WorldReadableFiles")
+	void saveAppSettings(Map<String,Object> app) {
+		SharedPreferences prefs = getApplicationContext().getSharedPreferences("ModSettings", Context.MODE_WORLD_READABLE);
+		Editor e = prefs.edit();
+		String packageName = (String)app.get("packageName");
+		e.putBoolean(packageName + "/" + "proxyEnabled", app.get("proxyHost") != null);
+		e.putString(packageName + "/" + "proxyHost", (String)app.get("proxyHost"));
+		e.putString(packageName + "/" + "proxyHost", String.valueOf(app.get("proxyPort")));
+
+		e.putBoolean(packageName + "/" + "limitBitmapDimensions", (Boolean)app.get("limitBitmapDimensions"));
+		e.putBoolean(packageName + "/" + "muteIfSientInProfileGroup", (Boolean)app.get("muteIfSientInProfileGroup"));
+		e.putBoolean(packageName + "/" + "preventService", (Boolean)app.get("preventService"));
+		e.putBoolean(packageName + "/" + "preventWakeLock", (Boolean)app.get("preventWakeLock"));
+		e.putBoolean(packageName + "/" + "preventAlarm", (Boolean)app.get("preventAlarm"));
+		e.putString(packageName + "/" + "alarmMultiplier", String.valueOf(app.get("alarmMultiplier")));
+		e.commit();
+	}
+	
+	@Override
+	public List<AppInfo> getAppList() {
+		return apps;
+	}
 
 
 	/**
@@ -176,25 +193,24 @@ public class TabsActivity extends FragmentActivity {
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+		Fragment[] fragments = {
+				new AllAppsSectionFragment(),
+				new EnabledAppsSectionFragment(),
+				new BackupFragment()
+		};
+		
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
 
 		@Override
 		public Fragment getItem(int position) {
-			switch (position) {
-			case 0:
-				return new AllAppsSectionFragment();
-			case 1:
-				return new EnabledAppsSectionFragment();
-			default:
-				return null;
-			}
+			return fragments[position];
 		}
 
 		@Override
 		public int getCount() {
-			return 2;
+			return fragments.length;
 		}
 
 		@Override
@@ -204,140 +220,10 @@ public class TabsActivity extends FragmentActivity {
 				return "All Apps";
 			case 1:
 				return "Enabled Apps";
+			case 2:
+				return "Backup/Restore";
 			}
 			return null;
-		}
-	}
-	
-	interface AppsListFragment {
-		void setApps(List<AppInfo> apps);
-		void appsChanged();
-	}
-
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class AllAppsSectionFragment extends Fragment implements AppsListFragment {
-		private AppListAdapter adapter;
-		
-		public AllAppsSectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			adapter = new AppListAdapter(inflater.getContext(), false);
-
-			View rootView = inflater.inflate(R.layout.fragment_app_list, container, false);
-			EditText text = (EditText)rootView.findViewById(R.id.filterText);
-			text.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void afterTextChanged(Editable editable) {
-					adapter.filter(editable.toString());
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start, int count,
-						int after) {
-				}
-
-				@Override
-				public void onTextChanged(CharSequence s, int start, int before,
-						int count) {
-				}
-				
-			});
-			ListView appsList = (ListView)rootView.findViewById(R.id.appsList);
-			appsList.setAdapter(adapter);
-			appsList.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-					Intent intent = new Intent(getActivity(), SettingsActivity.class);
-					intent.putExtra("packageName", ((AppInfo)adapter.getItemAtPosition(position)).packageName);
-					startActivityForResult(intent, 1);
-				}
-			});
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-			((TabsActivity)activity).addFragment(this);
-		}
-
-		@Override
-		public void onActivityResult(int requestCode, int resultCode, Intent data) {
-			if (requestCode == 1) {
-				String packageName = data.getStringExtra("packageName");
-				((TabsActivity)getActivity()).updatePackage(packageName);
-			}
-		}
-
-		@Override
-		public void setApps(List<AppInfo> apps) {
-			adapter.setApps(apps);
-		}
-
-		@Override
-		public void appsChanged() {
-			adapter.notifyDataSetChanged();
-		}
-	}
-
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class EnabledAppsSectionFragment extends Fragment implements AppsListFragment {
-		private AppListAdapter adapter;
-
-		public EnabledAppsSectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			adapter = new AppListAdapter(inflater.getContext(), true);
-
-			View rootView = inflater.inflate(R.layout.fragment_enabled_apps, container, false);
-			ListView appsList = (ListView)rootView.findViewById(R.id.appsList);
-			appsList.setAdapter(adapter);
-			appsList.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-					Intent intent = new Intent(getActivity(), SettingsActivity.class);
-					intent.putExtra("packageName", ((AppInfo)adapter.getItemAtPosition(position)).packageName);
-					startActivityForResult(intent, 1);
-				}
-			});
-			return rootView;
-		}
-
-		@Override
-		public void onActivityResult(int requestCode, int resultCode, Intent data) {
-			if (requestCode == 1) {
-				String packageName = data.getStringExtra("packageName");
-				((TabsActivity)getActivity()).updatePackage(packageName);
-			}
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-			((TabsActivity)activity).addFragment(this);
-		}
-		
-		@Override
-		public void setApps(List<AppInfo> apps) {
-			adapter.setApps(apps);
-		}
-
-		@Override
-		public void appsChanged() {
-			adapter.filter(null);
-			adapter.notifyDataSetChanged();
 		}
 	}
 

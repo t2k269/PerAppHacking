@@ -8,20 +8,27 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".AppListActivity" >
 
+    
     <EditText
         android:id="@+id/filterText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_alignLeft="@+id/appsList"
         android:layout_alignRight="@+id/appsList"
-        android:ems="10" />
+        android:ems="10" >
 
+    </EditText>
+    
     <ListView
         android:id="@+id/appsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/filterText" >
+
     </ListView>
 
 </RelativeLayout>
