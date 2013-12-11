@@ -31,9 +31,9 @@
     
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="forceUseNotificationVolumeForMusic"
-        android:summary="@string/pref_description_force_use_notification_volume_for_music"
-        android:title="@string/pref_title_force_use_notification_volume_for_music" />
+        android:key="muteIfSientInProfileGroup"
+        android:summary="@string/pref_description_mute_if_silent_in_profile_group"
+        android:title="@string/pref_title_mute_if_silent_in_profile_group" />
     
     <CheckBoxPreference
         android:defaultValue="false"

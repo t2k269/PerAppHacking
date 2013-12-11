@@ -97,6 +97,12 @@ class AppListAdapter extends BaseAdapter {
 		if (app.preventWakeLock) {
 			summaryBuilder.append(", Prevent Wake Lock");
 		}
+		if (app.limitBitmapDimensions) {
+			summaryBuilder.append(", Limit bitmap");
+		}
+		if (app.muteIfSientInProfileGroup) {
+			summaryBuilder.append(", Mute fix for CM");
+		}
 		stateHolder.setSummary(summaryBuilder.toString());
 		stateHolder.setColor(app.isEnabled() ? Color.WHITE : Color.GRAY);
 		return view;

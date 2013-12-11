@@ -13,7 +13,7 @@
 	<string name="pref_description_prevent_wake_lock">Prevent the app to acquire wake lock</string>
 	<string name="pref_description_limit_bitmap_dimensions">Limit BitmapFactory to output a bitmap not larger than screen resolution.</string>
 	<string name="pref_title_limit_bitmap_dimensions">Limit Bitmap dimensions</string>
-	<string name="pref_description_force_use_notification_volume_for_music">For app like Whatsapp, it uses Music volume to play notification sound, this voids the functionality of profile in CM. Force it to use notification volume.</string>
-	<string name="pref_title_force_use_notification_volume_for_music">Force to use Notification Volume for Music</string>
+	<string name="pref_description_mute_if_silent_in_profile_group">For app like Whatsapp, it uses MediaPlayer to play notification sound, this voids the functionality of profile in CM. Mute it if the coressponding profile is on.</string>
+	<string name="pref_title_mute_if_silent_in_profile_group">Force to mute the MediaPlayer if sient in Profile Group</string>
 		
 </resources>

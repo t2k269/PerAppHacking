@@ -2,18 +2,20 @@ package org.t2k269.perapphacking;
 
 import java.io.FileDescriptor;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.app.Application;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.media.AudioManager;
 import android.os.SystemClock;
 import android.util.TypedValue;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -30,6 +32,8 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 //	private static final String TAG = HackService.class.getSimpleName();
 	
 	private XSharedPreferences prefs;
+	
+	private Context appContext;
 	
 	@Override
 	public void initZygote(IXposedHookZygoteInit.StartupParam paramStartupParam) throws Throwable {
@@ -103,17 +107,25 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
     		XposedHelpers.findAndHookMethod(clazz, "decodeStream", InputStream.class, hook);
     		XposedHelpers.findAndHookMethod(clazz, "decodeStream", InputStream.class, Rect.class, BitmapFactory.Options.class, hook);
     	}
-    	if (prefs.getBoolean(lpparam.packageName + "/forceUseNotificationVolumeForMusic", false)) {
+    	if (prefs.getBoolean(lpparam.packageName + "/muteIfSientInProfileGroup", false)) {
+    		XposedHelpers.findAndHookMethod(Application.class, "onCreate", new XC_MethodHook() {
+    			 protected void beforeHookedMethod(MethodHookParam param) throws Throwable{
+    				 appContext = (Context)param.thisObject; 
+    			 }
+    		});
     		Class clazz = XposedHelpers.findClass("android.media.MediaPlayer", lpparam.classLoader);
     		XC_MethodHook hook = new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-	    			if (prefs.getBoolean(lpparam.packageName + "/forceUseNotificationVolumeForMusic", false)) {
-	    				param.args[0] = AudioManager.STREAM_NOTIFICATION;
+	    			if (prefs.getBoolean(lpparam.packageName + "/muteIfSientInProfileGroup", false)) {
+	    				if (appContext != null && !shouldPackagePlaySound(appContext, lpparam.packageName)) {
+	    					// Skip the start method
+	    					param.setResult(null);
+	    				}
 	    			}
 				}
     		};
-    		XposedHelpers.findAndHookMethod(clazz, "setAudioStreamType", int.class, hook);
+    		XposedHelpers.findAndHookMethod(clazz, "start", hook);
     	}
     	if (prefs.getBoolean(lpparam.packageName + "/preventAlarm", false)) {
     		Class alarmManagerClass = XposedHelpers.findClass("android.app.AlarmManager", lpparam.classLoader);
@@ -128,7 +140,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					multiplier = 0;
 	    				}
 	    				if (multiplier == 0) {
-		    				XposedBridge.log("Prevented " + lpparam.packageName + " to setAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ")");
+//		    				XposedBridge.log("Prevented " + lpparam.packageName + " to setAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ")");
 		    				param.setResult(null);
 		    				return;
 	    				} else {
@@ -136,7 +148,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					long at = (Long)param.args[1];
 	    					at = (at - now) * multiplier + now; 
 		    				param.args[1] = at;
-		    				XposedBridge.log("Delay " + lpparam.packageName + " to setAlarm(" + param.args[0] + ", " + at + ", " + param.args[2] + ")");
+//		    				XposedBridge.log("Delay " + lpparam.packageName + " to setAlarm(" + param.args[0] + ", " + at + ", " + param.args[2] + ")");
 	    				}
 	    			}
 				}
@@ -152,7 +164,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					multiplier = 0;
 	    				}
 	    				if (multiplier == 0) {
-	    					XposedBridge.log("Prevented " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ", " + param.args[3] + ")");
+//	    					XposedBridge.log("Prevented " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ", " + param.args[3] + ")");
 	    					param.setResult(null);
 	    					return;
 	    				} else {
@@ -161,10 +173,10 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					long interval = (Long)param.args[2];
 	    					at = (at - now) * multiplier + now; 
 	    					interval = interval * multiplier;
-	    					XposedBridge.log("Delay " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
+//	    					XposedBridge.log("Delay " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
 	    					param.args[1] = at;
 	    					param.args[2] = interval;
-	    					XposedBridge.log("Delay " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
+//	    					XposedBridge.log("Delay " + lpparam.packageName + " to setRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
 	    				}
 	    			}
 				}
@@ -180,7 +192,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					multiplier = 0;
 	    				}
 	    				if (multiplier == 0) {
-							XposedBridge.log("Prevented " + lpparam.packageName + " to setInexactRepeatingAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ", " + param.args[3] + ")");
+//							XposedBridge.log("Prevented " + lpparam.packageName + " to setInexactRepeatingAlarm(" + param.args[0] + ", " + param.args[1] + ", " + param.args[2] + ", " + param.args[3] + ")");
 							param.setResult(null);
 							return;
 	    				} else {
@@ -191,7 +203,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    					interval = interval * multiplier;
 	    					param.args[1] = at;
 	    					param.args[2] = interval;
-	    					XposedBridge.log("Delay " + lpparam.packageName + " to setInexactRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
+//	    					XposedBridge.log("Delay " + lpparam.packageName + " to setInexactRepeatingAlarm(" + param.args[0] + ", " + at + ", " + interval + ", " + param.args[3] + ")");
 	    				}
 	    			}
 				}
@@ -238,4 +250,33 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    	});
     	}
     }
+
+	
+	public enum Mode {
+        SUPPRESS, DEFAULT, OVERRIDE;
+    }
+	
+	private static boolean shouldPackagePlaySound(Context context, String packageName) {
+        if (!packageName.equals("android")) {
+        	try {
+				Object pm = context.getSystemService("profile" /*Context.PROFILE_SERVICE*/);
+				Method getActiveProfileGroupMethod = pm.getClass().getMethod("getActiveProfileGroup", String.class);
+				Object profileGroup = getActiveProfileGroupMethod.invoke(pm, packageName);
+				if (profileGroup != null) {
+					Method getSoundModeMethod = profileGroup.getClass().getMethod("getSoundMode");
+					Object mode = getSoundModeMethod.invoke(profileGroup);
+					Method nameMethod = mode.getClass().getMethod("name");
+					String name = (String)nameMethod.invoke(mode);
+					if ("SUPPRESS".equals(name))
+						return false;
+				}
+				return true;
+        	} catch (Exception ex) {
+            	XposedBridge.log("Retrieve profile group failed! " + ex.getMessage());
+        		return true;
+        	}
+        } else {
+    		return true;
+        }
+	}
 }

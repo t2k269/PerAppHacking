@@ -158,7 +158,7 @@ public class TabsActivity extends FragmentActivity {
 			app.proxyPort = -1;
 		}
 		app.limitBitmapDimensions = prefs.getBoolean(app.packageName + "/" + "limitBitmapDimensions", false);
-		app.forceUseNotificationVolumeForMusic = prefs.getBoolean(app.packageName + "/" + "forceUseNotificationVolumeForMusic", false);
+		app.muteIfSientInProfileGroup = prefs.getBoolean(app.packageName + "/" + "muteIfSientInProfileGroup", false);
 		app.preventService = prefs.getBoolean(app.packageName + "/" + "preventService", false);
 		app.preventWakeLock = prefs.getBoolean(app.packageName + "/" + "preventWakeLock", false);
 		app.preventAlarm = prefs.getBoolean(app.packageName + "/" + "preventAlarm", false);
