@@ -1,5 +1,7 @@
 package org.t2k269.perapphacking;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -151,6 +153,9 @@ public class TabsActivity extends FragmentActivity implements AppListAdapter.Dat
 			app.proxyHost = null;
 			app.proxyPort = -1;
 		}
+		app.timeMachine = prefs.getString(app.packageName + "/timeMachine", "");
+		if (app.timeMachine.length() == 0)
+			app.timeMachine = null;
 		app.limitBitmapDimensions = prefs.getBoolean(app.packageName + "/" + "limitBitmapDimensions", false);
 		app.muteIfSientInProfileGroup = prefs.getBoolean(app.packageName + "/" + "muteIfSientInProfileGroup", false);
 		app.preventService = prefs.getBoolean(app.packageName + "/" + "preventService", false);
@@ -170,14 +175,19 @@ public class TabsActivity extends FragmentActivity implements AppListAdapter.Dat
 		String packageName = (String)app.get("packageName");
 		e.putBoolean(packageName + "/" + "proxyEnabled", app.get("proxyHost") != null);
 		e.putString(packageName + "/" + "proxyHost", (String)app.get("proxyHost"));
-		e.putString(packageName + "/" + "proxyHost", String.valueOf(app.get("proxyPort")));
+		int port = ((Number)app.get("proxyPort")).intValue();
+		if (port <= 0)
+			e.remove(packageName + "/" + "proxyPort");
+		else
+			e.putString(packageName + "/" + "proxyPort", String.valueOf(port));
 
+		e.putString(packageName + "/" + "timeMachine", (String)app.get("timeMachine"));
 		e.putBoolean(packageName + "/" + "limitBitmapDimensions", (Boolean)app.get("limitBitmapDimensions"));
 		e.putBoolean(packageName + "/" + "muteIfSientInProfileGroup", (Boolean)app.get("muteIfSientInProfileGroup"));
 		e.putBoolean(packageName + "/" + "preventService", (Boolean)app.get("preventService"));
 		e.putBoolean(packageName + "/" + "preventWakeLock", (Boolean)app.get("preventWakeLock"));
 		e.putBoolean(packageName + "/" + "preventAlarm", (Boolean)app.get("preventAlarm"));
-		e.putString(packageName + "/" + "alarmMultiplier", String.valueOf(app.get("alarmMultiplier")));
+		e.putString(packageName + "/" + "alarmMultiplier", app.containsKey("alarmMultiplier") ? String.valueOf(((Number)app.get("alarmMultiplier")).intValue()) : "0");
 		e.commit();
 	}
 	

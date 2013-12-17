@@ -5,6 +5,8 @@
 	<string name="pref_description_enable_proxy">Use proxy for the application</string>
     <string name="pref_title_proxy_host">Proxy Host</string>
 	<string name="pref_title_proxy_port">Proxy Port</string>
+	<string name="pref_title_time_machine">Time Machine</string>
+	<string name="pref_description_time_machine">Adjust the system time based on the input. Format is YYYY-MM-DD HH:MI</string>
 	<string name="pref_title_prevent_alarm">Prevent Alarm</string>
 	<string name="pref_description_prevent_alarm">Prevent the app to set alarm by AlarmManager</string>
 	<string name="pref_title_prevent_service">Prevent Service</string>
@@ -15,5 +17,5 @@
 	<string name="pref_title_limit_bitmap_dimensions">Limit Bitmap dimensions</string>
 	<string name="pref_description_mute_if_silent_in_profile_group">For app like Whatsapp, it uses MediaPlayer to play notification sound, this voids the functionality of profile in CM. Mute it if the coressponding profile is on.</string>
 	<string name="pref_title_mute_if_silent_in_profile_group">Force to mute the MediaPlayer if sient in Profile Group</string>
-		
+	
 </resources>

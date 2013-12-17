@@ -1,11 +1,15 @@
 package org.t2k269.perapphacking;
 
+import java.util.Date;
+
 public class AppInfo implements Comparable<AppInfo> {
 	public final String name;
 	public final String packageName;
 	
 	public String proxyHost = null;
 	public int proxyPort = -1;
+	
+	public String timeMachine = null;
 	
 	public boolean limitBitmapDimensions = false;
 	public boolean muteIfSientInProfileGroup = false;
@@ -22,7 +26,7 @@ public class AppInfo implements Comparable<AppInfo> {
 	}
 	
 	public boolean isEnabled() {
-		return proxyHost != null || limitBitmapDimensions || muteIfSientInProfileGroup || preventAlarm || preventService || preventWakeLock;
+		return (proxyHost != null && proxyPort > 0) || timeMachine != null || limitBitmapDimensions || muteIfSientInProfileGroup || preventAlarm || preventService || preventWakeLock;
 	}
 
 	@Override

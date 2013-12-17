@@ -3,6 +3,7 @@ package org.t2k269.perapphacking;
 import java.io.FileDescriptor;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -67,6 +68,34 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    			}
     			}
     		});
+    	}
+    	if (prefs.getString(lpparam.packageName + "/timeMachine", "").length() > 0) {
+    		try {
+    			final long fakeTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(prefs.getString(lpparam.packageName + "/timeMachine", "")).getTime();
+        		final Long[] baseHolder = new Long[1];
+        		Class contextWrapperClass = XposedHelpers.findClass("java.lang.System", lpparam.classLoader);
+        		XposedHelpers.findAndHookMethod(contextWrapperClass, "currentTimeMillis", new XC_MethodHook() {
+    				@Override
+        			protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+    	    			if (baseHolder[0] == null) {
+    	    				baseHolder[0] = (Long)param.getResult();
+    	    				return;
+    	    			}
+    	    			long baseTime = baseHolder[0];
+    	    			long currTime = (Long)param.getResult();
+    	    			param.setResult(currTime - baseTime + fakeTime);
+        			}
+        		});
+        		XposedHelpers.findAndHookMethod("android.text.format.Time", lpparam.classLoader, "setToNow", new XC_MethodHook() {
+    				@Override
+        			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+    	    			((android.text.format.Time)param.thisObject).set(fakeTime);
+    	    			param.setResult(null);
+        			}
+        		});
+    		} catch (Exception ex) {
+    			// Ignore if the date is invalid
+    		}
     	}
     	if (prefs.getBoolean(lpparam.packageName + "/limitBitmapDimensions", false)) {
     		Class clazz = XposedHelpers.findClass("android.graphics.BitmapFactory", lpparam.classLoader);

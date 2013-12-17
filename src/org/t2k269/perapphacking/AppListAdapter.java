@@ -100,6 +100,9 @@ class AppListAdapter extends BaseAdapter {
 		if (app.preventWakeLock) {
 			summaryBuilder.append(", Prevent Wake Lock");
 		}
+		if (app.timeMachine != null) {
+			summaryBuilder.append(", Time Machine");
+		}
 		if (app.limitBitmapDimensions) {
 			summaryBuilder.append(", Limit bitmap");
 		}
