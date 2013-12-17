@@ -211,7 +211,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
     	}
     	if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
     		Class wakeLockClass = XposedHelpers.findClass("android.os.PowerManager$WakeLock", lpparam.classLoader);
-    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquireMethod", new XC_MethodHook() {
+    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquire", new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
@@ -220,7 +220,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    			}
 				}
     		});
-    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquireTimeoutMethod", Long.class, new XC_MethodHook() {
+    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquire", Long.class, new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
