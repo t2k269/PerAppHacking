@@ -238,9 +238,8 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 				}
     		});
     	}
-    	if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
-    		Class wakeLockClass = XposedHelpers.findClass("android.os.PowerManager$WakeLock", lpparam.classLoader);
-    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquire", new XC_MethodHook() {
+    	if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) { 
+    		XposedHelpers.findAndHookMethod("android.os.PowerManager$WakeLock", lpparam.classLoader, "acquire", new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
@@ -249,7 +248,8 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    			}
 				}
     		});
-    		XposedHelpers.findAndHookMethod(wakeLockClass, "acquire", Long.class, new XC_MethodHook() {
+    		/*
+    		XposedHelpers.findAndHookMethod("android.os.PowerManager.WakeLock", lpparam.classLoader, "acquire", Long.class, new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
@@ -257,7 +257,7 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 	    				return;
 	    			}
 				}
-    		});
+    		});*/
     	}
     	if (prefs.getBoolean(lpparam.packageName + "/proxyEnabled", false)) {
 	    	XposedBridge.hookAllConstructors(XposedHelpers.findClass("org.apache.http.impl.client.DefaultHttpClient", lpparam.classLoader), new XC_MethodHook() {
