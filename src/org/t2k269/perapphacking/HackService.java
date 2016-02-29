@@ -238,8 +238,8 @@ public class HackService implements IXposedHookZygoteInit, IXposedHookLoadPackag
 				}
     		});
     	}
-    	if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
-    		XposedHelpers.findAndHookMethod("android.os.PowerManager.WakeLock", lpparam.classLoader, "acquire", new XC_MethodHook() {
+    	if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) { 
+    		XposedHelpers.findAndHookMethod("android.os.PowerManager$WakeLock", lpparam.classLoader, "acquire", new XC_MethodHook() {
 				@Override
     			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 	    			if (prefs.getBoolean(lpparam.packageName + "/preventWakeLock", false)) {
